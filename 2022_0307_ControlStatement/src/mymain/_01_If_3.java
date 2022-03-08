@@ -41,7 +41,7 @@ public class _01_If_3 {
 		else {
 			System.out.printf("입력된 점수 %d는 유효하지 않습니다.", kor);
 		}
-		
+		scanner.close();
 	}
 
 }

@@ -20,16 +20,19 @@ public class _02_Switch_3 {
 		
 		// 
 		if (kor>=0 && kor <=100) {
+			
 		switch(kor/10) {
 		case 9, 10 : grade = "A"; break;
-		case 8 : grade = "B"; break;
-		case 7 : grade = "C"; break;
-		case 6 : grade = "D"; break;
+		case 8     : grade = "B"; break;
+		case 7     : grade = "C"; break;
+		case 6     : grade = "D"; break;
 		
 		default : grade = "F";
 		
-		} System.out.printf("점수: %d 등급: %s", kor, grade);
-		}else {
+		} 
+		System.out.printf("점수: %d 등급: %s", kor, grade);
+		
+		} else {
 			System.out.println("유효한 숫자가 아닙니다.");
 		}
 		
