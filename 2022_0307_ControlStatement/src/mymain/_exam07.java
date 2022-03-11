@@ -7,14 +7,11 @@ public class _exam07 {
 		
 		System.out.println("Á¤¼ö°ª\tÁ¦°ö\t¼¼Á¦°ö");
 		
-		for(int i = 1;i<=5;i++)
-		{
+		for(int i = 1;i<=5;i++){
 			System.out.printf("%d\t",i);
 			System.out.printf("%d\t",i*i);
 			System.out.printf("%d",i*i*i);
 			System.out.println();
-			
-			
 			
 		}
 		
