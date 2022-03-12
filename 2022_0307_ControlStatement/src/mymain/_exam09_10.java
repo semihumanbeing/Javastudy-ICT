@@ -5,7 +5,7 @@ public class _exam09_10 {
 	public static void main(String[] args) {
 		//9¹ø¹®Á¦
 		
-		int n = 6;
+		int n = 8;
 		int sum = 1;
 		for(int m = n;m>0;m--)
 		{
