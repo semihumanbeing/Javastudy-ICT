@@ -31,19 +31,19 @@ public void displayResult() {
 	int price = 0;
 	if (money>=COLA||money>=CIDER||money>=JUICE|| money>= MILK) {
 		
-	if(drink == DRINK_COLA) {
-		price = COLA;
-		System.out.printf("받은금액: %d 선택음료: 콜라(%d), 거스름돈 %d",money,COLA,(money-COLA));
-	} else if (drink == DRINK_CIDER) {
-		price = CIDER;
-		System.out.printf("받은금액: %d 선택음료: 사이다(%d), 거스름돈 %d",money,CIDER,(money-CIDER));
-	} else if (drink == DRINK_JUICE) {
-		price = JUICE;
-		System.out.printf("받은금액: %d 선택음료: 쥬스(%d), 거스름돈 %d",money,JUICE,(money-JUICE));
-	} else if (drink == DRINK_MILK) {
-		price = MILK;
-		System.out.printf("받은금액: %d 선택음료: 우유(%d), 거스름돈 %d",money,MILK,(money-MILK));
-	} 
+		if(drink == DRINK_COLA) {
+			price = COLA;
+			System.out.printf("받은금액: %d 선택음료: 콜라(%d), 거스름돈 %d",money,COLA,(money-COLA));
+		} else if (drink == DRINK_CIDER) {
+			price = CIDER;
+			System.out.printf("받은금액: %d 선택음료: 사이다(%d), 거스름돈 %d",money,CIDER,(money-CIDER));
+		} else if (drink == DRINK_JUICE) {
+			price = JUICE;
+			System.out.printf("받은금액: %d 선택음료: 쥬스(%d), 거스름돈 %d",money,JUICE,(money-JUICE));
+		} else if (drink == DRINK_MILK) {
+			price = MILK;
+			System.out.printf("받은금액: %d 선택음료: 우유(%d), 거스름돈 %d",money,MILK,(money-MILK));
+		} 
 	} else {
 		System.out.print("잔액이 부족합니다.");
 	}
