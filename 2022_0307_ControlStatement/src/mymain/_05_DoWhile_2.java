@@ -2,7 +2,7 @@ package mymain;
 
 import java.util.Scanner;
 
-public class _05_DoWhile_1 {
+public class _05_DoWhile_2 {
 
 	public static void main(String[] args) {
 		
@@ -14,13 +14,16 @@ public class _05_DoWhile_1 {
 			System.out.print("몇단인가요?: ");		
 			mTable = scanner.nextInt();	
 		
-		if (mTable>=2 && mTable <=9) {	
+		if (!(mTable>=2 && mTable <=9)) {	//2~9사이가 아니면
+			System.out.println("2~9 사이의 값을 입력하세요.");
+			continue;
+		}
+			
 			for (int i=1; i<=9; i++) 
 		System.out.printf("%d x %d = %d\n", mTable, i, mTable*i);
 		
-		} else {
-			System.out.println("2~9 사이의 값을 입력하세요.");
-		} 
+		
+		 
 		System.out.println("다시하기 y/n: ");
 		yn = scanner.next();
 		
