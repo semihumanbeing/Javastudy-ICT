@@ -3,6 +3,7 @@ package mymain;
 import java.util.Scanner;
 
 import myutil.SSN;
+import myutil.SSN2;
 
 public class MyMain_SSN {
 
@@ -12,7 +13,7 @@ public class MyMain_SSN {
 		
 		String socialSecurityNumber;
 		String yn = "y";
-		SSN ssn = new SSN();
+		SSN2 ssn = new SSN2();
 		
 		while(true) {
 			System.out.print("주민번호를 입력하세요(xxxxxx-xxxxxxx): ");
