@@ -2,6 +2,9 @@ package mymain;
 
 import java.util.Scanner;
 
+import myutil.LottoForLoop;
+import myutil.LottoHashSet;
+
 public class _1_MyMain_Array5_exam {
 
 	public static void main(String[] args) {
@@ -13,11 +16,12 @@ public class _1_MyMain_Array5_exam {
 		String yn = "y";
 		
 		//추첨실행
-		Lotto lotto = new Lotto();
+		LottoForLoop lotto = new LottoForLoop();
 		lotto.makeWinNo();
+		lotto.makeBonusNo();
 		
 		while(true) {
-		System.out.println("숫자 6개를 입력하세요: ");
+		System.out.print("숫자 6개를 입력하세요: ");
 		userNo[0] = scanner.nextInt();
 		userNo[1] = scanner.nextInt();
 		userNo[2] = scanner.nextInt();
@@ -26,12 +30,12 @@ public class _1_MyMain_Array5_exam {
 		userNo[5] = scanner.nextInt();
 		
 		
-		
 		// 로또객체에게 입력값 넘겨주기
 		lotto.setUserNo(userNo);
 		
 		
 		// 로또객체로부터 출력하기
+		lotto.makeRank();
 		lotto.display();
 		
 		System.out.println();
