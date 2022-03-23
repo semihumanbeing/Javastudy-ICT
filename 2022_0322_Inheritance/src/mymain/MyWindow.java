@@ -1,5 +1,6 @@
 package mymain;
 
+import javax.swing.JButton;
 //import java.awt.Frame;
 //AWT = Abstract Window Toolkit
 import javax.swing.JFrame;
@@ -14,6 +15,14 @@ public class MyWindow extends JFrame {
 		super("My window");
 		
 		super.setTitle("안녕하세요");
+		
+		//container 기능
+		JButton jbt = new JButton("hi");
+		super.add(jbt, "North");
+		
+		JButton jbt1 = new JButton("하이루");
+		super.add(jbt1, "West");
+		
 		// 위치
 		super.setLocation(100, 100);
 		// 크기
