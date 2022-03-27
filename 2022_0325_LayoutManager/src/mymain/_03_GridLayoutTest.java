@@ -15,7 +15,7 @@ public class _03_GridLayoutTest extends JFrame {
 		GridLayout gl = new GridLayout(6, 4); // 열의 숫자가 정해져 있어도 행의 숫자를 기준으로 세팅이 된다.
 		this.setLayout(gl);
 
-		for (int i = 0; i <= 24; i++) {
+		for (int i = 0; i < 24; i++) {
 			String title = String.format("%02d", i);
 			JButton jbt = new JButton(title);
 			this.add(jbt);
