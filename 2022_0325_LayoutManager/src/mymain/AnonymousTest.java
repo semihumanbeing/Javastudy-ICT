@@ -19,17 +19,18 @@ public class AnonymousTest {
 	}
 
 	public static void main(String[] args) {
-		AnonymousTest anonTest = new AnonymousTest();
-
-		TestA a = anonTest.new TestB();
+		new AnonymousTest() {
+		
+		TestA a = new TestB();{
 		a.sub();
-
-		TestA aa = anonTest.new TestA() {
+		}
+		TestA aa = new TestA() {
 			public void sub() {
 				super.sub();
 			}
+		
 		};
-
+		};
 	}
-
+	
 }
