@@ -19,6 +19,11 @@ public class _02_ArrayListTest {
 		for(String city : a) {
 			System.out.println(city);
 		}
+		a.remove(1);
+		for(String city : a) {
+			System.out.println(city);
+		}
+		
 		
 		System.out.println("--index--");
 		
