@@ -12,7 +12,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -51,8 +53,19 @@ public class MultiCastChat extends JFrame {
 	// 목록 출력용 컴포넌트
 	JList<String> jListGroup = new JList<String>();
 	
-	String[] groupNameArray =     {"총무부",   "인사부",   "경리부",   "영업부"   ,"기획실",   "전체전송",};
+	Map<String, String> departmentMap = new HashMap<String, String>(){{
+	    put("총무부", "224.0.0.1");
+	    put("인사부", "224.0.0.2");
+	    put("경리부", "224.0.0.3");
+	    put("영업부", "224.0.0.4");
+	    put("강아지동영상감상부", "224.0.0.5");
+	    put("전체전송", "255.255.255.255");
+	}};
+
+	String[] groupNameArray = {"총무부",   "인사부",   "경리부",   "영업부"   ,"강아지동영상감상부",   "전체전송",};
 	String [] groupIPArray = {"224.0.0.1","224.0.0.2","224.0.0.3","224.0.0.4","224.0.0.5","255.255.255.255",};
+	//	String[] groupNameArray = (String[]) departmentMap.keySet().toArray();
+	//  String [] groupIPArray = (String[]) departmentMap.values().toArray();
 
 	public MultiCastChat() {
 
@@ -203,14 +216,17 @@ public class MultiCastChat extends JFrame {
 
 		// 1번째 줄: 주소
 		// addressField = new JTextField("255.255.255.255"); // global broadcast 주소
-		groupNameField = new JComboBox<String>(groupNameArray);
-		
 		JPanel panel0 = new JPanel(new GridLayout(1,2));
-		addressField = new JTextField("224.0.0.1"); // multicast 주소
-		addressField.setFont(font);
-		JComboBox<String> comboBox = new JComboBox<String>(groupNameArray);
+		groupNameField = new JComboBox<String>(groupNameArray);
+		updateShownIPAddress();
+		groupNameField.addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+		    	updateShownIPAddress();
+		    }
+		});
 		
-		panel0.add(comboBox);
+		
+		panel0.add(groupNameField);
 		panel0.add(addressField);
 		
 		
@@ -247,31 +263,39 @@ public class MultiCastChat extends JFrame {
 			onDeleteAccountButton();
 		});
 	}
+	
+	private void updateShownIPAddress() {
+		String currentGroup = (String) groupNameField.getSelectedItem();
+		if(addressField == null) {
+			addressField = new JTextField(departmentMap.get(currentGroup)); // multicast 주소
+		}
+		else {
+			addressField.setText(departmentMap.get(currentGroup));
+			addressField.update(getGraphics());
+		}
+		addressField.setFont(font);
+	}
 
 	@SuppressWarnings("deprecation")
 	protected void onJoinButton() {
-		// System.out.println("가입하기");
-		// 1. 주소 읽어오기
-		String ip = addressField.getText().trim();
-		if (ip.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "가입할 주소를 입력하세요");
-			addressField.setText("224.0.0.1");
-			return;
-		}
-
-		// 가입여부 확인하기
-		if (groupList.contains(ip)) {
-			JOptionPane.showMessageDialog(this, "이미 가입된 주소입니다.");
-			return;
-		}
-
-		// 가입하기
 		try {
+			// System.out.println("가입하기");
+			// 1. 주소 읽어오기
+			String groupName = (String) groupNameField.getSelectedItem();
+			String ip = addressField.getText().trim();
+			System.out.print(groupName);
+			
+
+			// 가입여부 확인하기
+			if (groupList.contains(groupName)) {
+				JOptionPane.showMessageDialog(this, "이미 가입된 주소입니다.");
+				return;
+			}
 			// 네트워크상 가입성공
 			InetAddress ia = InetAddress.getByName(ip);
 			multiCastSocket.joinGroup(ia);
 			// 가입된 주소를 arrayList에 넣는다.
-			groupList.add(ip);
+			groupList.add((String) groupNameField.getSelectedItem());//TODO change to group name, not IP
 			// 오른쪽JList창 갱신
 			updateGroupList();
 		} catch (Exception e) {
@@ -291,9 +315,10 @@ public class MultiCastChat extends JFrame {
 	protected void onDeleteAccountButton() {
 		// System.out.println("탈퇴하기");
 		// 1. 주소 읽어오기
-		String ip = jListGroup.getSelectedValue();
+		String groupName = jListGroup.getSelectedValue();
+		
 
-		if (ip == null) {
+		if (groupName == null) {
 			JOptionPane.showMessageDialog(this, "탈퇴할 그룹주소를 선택하세요");
 			return;
 		}
@@ -304,10 +329,11 @@ public class MultiCastChat extends JFrame {
 
 		// 탈퇴하기
 		try {
+			String ip = departmentMap.get(groupName);
 			// 네트워크상 가입성공
 			InetAddress ia = InetAddress.getByName(ip);
 			// 가입된 주소를 arrayList에서 삭제한다.
-			groupList.remove(ip);
+			groupList.remove(groupName);
 			multiCastSocket.leaveGroup(ia);
 			// 오른쪽JList창 갱신
 			updateGroupList();
