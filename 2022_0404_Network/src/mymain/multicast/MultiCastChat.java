@@ -38,7 +38,7 @@ public class MultiCastChat extends JFrame {
 	JTextField addressField;
 	// 그룹명
 	JComboBox<String> groupNameField;
-	
+
 	// 대화명
 	String nickName = "꽈배기";
 
@@ -52,20 +52,22 @@ public class MultiCastChat extends JFrame {
 	List<String> groupList = new ArrayList<String>();
 	// 목록 출력용 컴포넌트
 	JList<String> jListGroup = new JList<String>();
-	
-	Map<String, String> departmentMap = new HashMap<String, String>(){{
-	    put("총무부", "224.0.0.1");
-	    put("인사부", "224.0.0.2");
-	    put("경리부", "224.0.0.3");
-	    put("영업부", "224.0.0.4");
-	    put("강아지동영상감상부", "224.0.0.5");
-	    put("전체전송", "255.255.255.255");
-	}};
 
-	String[] groupNameArray = {"총무부",   "인사부",   "경리부",   "영업부"   ,"강아지동영상감상부",   "전체전송",};
-	String [] groupIPArray = {"224.0.0.1","224.0.0.2","224.0.0.3","224.0.0.4","224.0.0.5","255.255.255.255",};
-	//	String[] groupNameArray = (String[]) departmentMap.keySet().toArray();
-	//  String [] groupIPArray = (String[]) departmentMap.values().toArray();
+	Map<String, String> departmentMap = new HashMap<String, String>() {
+		{
+			put("총무부", "224.0.0.1");
+			put("인사부", "224.0.0.2");
+			put("경리부", "224.0.0.3");
+			put("영업부", "224.0.0.4");
+			put("강아지동영상감상부", "224.0.0.5");
+			put("전체전송", "255.255.255.255");
+		}
+	};
+
+	String[] groupNameArray = { "총무부", "인사부", "경리부", "영업부", "강아지동영상감상부", "전체전송", };
+	String[] groupIPArray = { "224.0.0.1", "224.0.0.2", "224.0.0.3", "224.0.0.4", "224.0.0.5", "255.255.255.255", };
+	// String[] groupNameArray = (String[]) departmentMap.keySet().toArray();
+	// String [] groupIPArray = (String[]) departmentMap.values().toArray();
 
 	public MultiCastChat() {
 
@@ -131,8 +133,8 @@ public class MultiCastChat extends JFrame {
 
 	protected void readMessage() {
 		try {
-			byte[] readBuffer = new byte[512];
 			// 읽어온 데이터를 넣을 버퍼를 지정
+			byte[] readBuffer = new byte[512];
 			DatagramPacket dp = new DatagramPacket(readBuffer, readBuffer.length);
 			// 소켓을 통해서 수신
 			multiCastSocket.receive(dp); // 메시지가 올때까지 대기
@@ -213,23 +215,23 @@ public class MultiCastChat extends JFrame {
 
 	private void initInput() {
 		JPanel panel = new JPanel(new GridLayout(3, 1));
-
-		// 1번째 줄: 주소
+		// 1번째 줄: 콤보박스
 		// addressField = new JTextField("255.255.255.255"); // global broadcast 주소
-		JPanel panel0 = new JPanel(new GridLayout(1,2));
+		JPanel panel0 = new JPanel(new GridLayout(1, 1));
+		// 콤보박스는 어레이를 통해서 선택된 객체가 groupNameField로 이동한다.
+		// (콤보박스는 어레이만 받을수 있기 때문에)
 		groupNameField = new JComboBox<String>(groupNameArray);
+		// 값이 선택되었을때 해당하는 IP를 선택하는 메서드가 작동된다.
 		updateShownIPAddress();
-		groupNameField.addActionListener (new ActionListener () {
-		    public void actionPerformed(ActionEvent e) {
-		    	updateShownIPAddress();
-		    }
+		// groupNameField의 actionListener가 대기하고 있다가 부서명이 선택되면 메서드가 작동된다.
+		groupNameField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updateShownIPAddress();
+			}
 		});
-		
-		
+
 		panel0.add(groupNameField);
-		panel0.add(addressField);
-		
-		
+
 		// 2번째 줄: 가입, 탈퇴 버튼
 		JPanel panel1 = new JPanel(new GridLayout(1, 2));
 		JButton joinButton = new JButton("가입");
@@ -251,25 +253,21 @@ public class MultiCastChat extends JFrame {
 		this.add(panel, "South");
 
 		// 버튼이벤트 등록하기
-		joinButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				onJoinButton(); // on이 붙은 메서드는 주로 callback메서드이다. (이벤트에서 자동호출)
-
-			}
+		joinButton.addActionListener(e -> {
+			onJoinButton(); // on이 붙은 메서드는 주로 callback메서드이다. (이벤트에서 자동호출)
 		});
+
 		deleteAccountButton.addActionListener(e -> {
 			onDeleteAccountButton();
 		});
 	}
-	
+
 	private void updateShownIPAddress() {
+		// 콤보박스에서 선택하면 해당하는 IP value를 추출한다.
 		String currentGroup = (String) groupNameField.getSelectedItem();
-		if(addressField == null) {
+		if (addressField == null) {
 			addressField = new JTextField(departmentMap.get(currentGroup)); // multicast 주소
-		}
-		else {
+		} else {
 			addressField.setText(departmentMap.get(currentGroup));
 			addressField.update(getGraphics());
 		}
@@ -283,8 +281,6 @@ public class MultiCastChat extends JFrame {
 			// 1. 주소 읽어오기
 			String groupName = (String) groupNameField.getSelectedItem();
 			String ip = addressField.getText().trim();
-			System.out.print(groupName);
-			
 
 			// 가입여부 확인하기
 			if (groupList.contains(groupName)) {
@@ -295,7 +291,7 @@ public class MultiCastChat extends JFrame {
 			InetAddress ia = InetAddress.getByName(ip);
 			multiCastSocket.joinGroup(ia);
 			// 가입된 주소를 arrayList에 넣는다.
-			groupList.add((String) groupNameField.getSelectedItem());//TODO change to group name, not IP
+			groupList.add((String) groupNameField.getSelectedItem());// TODO change to group name, not IP
 			// 오른쪽JList창 갱신
 			updateGroupList();
 		} catch (Exception e) {
@@ -315,20 +311,18 @@ public class MultiCastChat extends JFrame {
 	protected void onDeleteAccountButton() {
 		// System.out.println("탈퇴하기");
 		// 1. 주소 읽어오기
-		String groupName = jListGroup.getSelectedValue();
-		
-
-		if (groupName == null) {
-			JOptionPane.showMessageDialog(this, "탈퇴할 그룹주소를 선택하세요");
-			return;
-		}
-
-		int result = JOptionPane.showConfirmDialog(this, "탈퇴하시겠습니까?", "그룹탈퇴", JOptionPane.YES_NO_OPTION);
-		if (result != 0)
-			return;
-
-		// 탈퇴하기
 		try {
+			// 그룹리스트에서 선택된값
+			String groupName = jListGroup.getSelectedValue();
+			// 탈퇴하기
+			if (groupName == null) {
+				JOptionPane.showMessageDialog(this, "탈퇴할 그룹주소를 선택하세요");
+				return;
+			}
+
+			int result = JOptionPane.showConfirmDialog(this, "탈퇴하시겠습니까?", "그룹탈퇴", JOptionPane.YES_NO_OPTION);
+			if (result != 0)
+				return;
 			String ip = departmentMap.get(groupName);
 			// 네트워크상 가입성공
 			InetAddress ia = InetAddress.getByName(ip);
@@ -345,9 +339,9 @@ public class MultiCastChat extends JFrame {
 
 	private void initDisplay() {
 		textArea = new JTextArea();
-		JScrollPane jsp = new JScrollPane(textArea);
-		jsp.setPreferredSize(new Dimension(400, 400));
-		this.add(jsp, "Center");
+		JScrollPane jScrollPane = new JScrollPane(textArea);
+		jScrollPane.setPreferredSize(new Dimension(400, 400));
+		this.add(jScrollPane, "Center");
 
 		// textArea 읽기전용으로 만들기 (편집x)
 		textArea.setEditable(false);
