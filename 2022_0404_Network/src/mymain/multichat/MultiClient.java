@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,13 +38,12 @@ public class MultiClient extends JFrame {
 	JButton connectButton;
 	// 연결상태를 확인하는 버튼
 	boolean connectCheck = false;
-	
+
 	// 네트워크
 	Socket client;
-	
+
 	BufferedReader buffReader;
 	String nickname = "꽈배기";
-	
 
 	public MultiClient() {
 
@@ -86,7 +87,29 @@ public class MultiClient extends JFrame {
 				onConnectButton();
 			}
 		});
+		
+		//메시지창에서 입력했을때 이벤트처리
+		messageField.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				int key = e.getKeyCode();
+				if(key == KeyEvent.VK_ENTER) {
+					sendMessage();
+				}
+			}
+		});
 
+	}
+
+	protected void sendMessage() {
+		//연결되어 있지 않으면 끝내기
+		if(connectCheck == false) {
+			JOptionPane.showMessageDialog(this, "연결 후 메시지를 입력할 수 있습니다.");
+			messageField.setText("");
+			return;
+		}
+		
+		
 	}
 
 	protected void onConnectButton() {
@@ -94,31 +117,32 @@ public class MultiClient extends JFrame {
 
 		if (connectCheck) { // 연결
 			try {
-				client = new Socket("localhost", 8000);
-				//첫번째 입장 메시지 전송
+				client = new Socket("192.168.0.9", 8000);
+				//client = new Socket("localhost", 8000);
+				// 첫번째 입장 메시지 전송
 				String sentMessage = String.format("IN#%s\n", nickname);
 				client.getOutputStream().write(sentMessage.getBytes());
-				//메시지 수신대기
+				// 메시지 수신대기
 				readMessage();
-				
+
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(this, "연결실패");
 				connectCheck = false;
 				return;
-				
+
 			}
 		} else { // 끊기
-			
+
 			try {
-				//소켓을 닫는다.
+				// 소켓을 닫는다.
 				client.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 		}
-		
+
 		// 버튼의 캡션 변경
 		connectButton.setText(connectCheck ? "끊기" : "연결");
 	}
@@ -129,31 +153,55 @@ public class MultiClient extends JFrame {
 			input = client.getInputStream();
 			InputStreamReader inputReader = new InputStreamReader(input);
 			buffReader = new BufferedReader(inputReader);
-			
-			//데이터 수신대기용 스레드 생성
+
+			//  수신대기용 스레드 생성
 			new Thread() {
 				public void run() {
-					while(true) {
+					while (true) {
 						try {
 							String readData = buffReader.readLine();
-							if(readData==null) {
+							if (readData == null) {
 								break;
 								// 사용자 프로토콜 종류에 따라 코드 진행
 							}
-							
+							String[] messageArray = readData.split("#");
+							if (messageArray[0].equals("IN")) {
+								String displayMessage = String.format("%s님이 입장하셨습니다.", messageArray[1]);
+								displayMessage(displayMessage);
+							} else if (messageArray[0].equals("OUT")) {
+								String displayMessage = String.format("%s님이 퇴장하셨습니다.", messageArray[1]);
+								displayMessage(displayMessage);
+							} else if (messageArray[0].equals("LIST")) {
+								messageArray[0] = "";
+								displayUserList(messageArray);
+							}
+
 						} catch (IOException e) {
 							break;
 						}
 					}
-					//상대방 소켓이 끊긴경우에 대한 코드
+					// 상대방 소켓이 끊긴경우에 대한 코드
+					connectCheck = false;
+					connectButton.setText("연결");
+
+					// 유저목록 초기화
+					String [] userArray = new String[0];
+					userList.setListData(userArray);
+					JOptionPane.showMessageDialog(MultiClient.this, "연결이 끊어졌습니다");
 					
+
 				}
 			}.start();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
+	}
+
+	protected void displayUserList(String[] userArray) {
+
+		userList.setListData(userArray);
 	}
 
 	public void displayMessage(String message) { // 채팅 기능
@@ -187,7 +235,5 @@ public class MultiClient extends JFrame {
 		new MultiClient();
 
 	}
-	
-	
 
 }

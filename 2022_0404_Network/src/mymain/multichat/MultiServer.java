@@ -31,14 +31,18 @@ public class MultiServer extends JFrame {
 	JList<String> userJList;
 
 	Font font = new Font("", Font.BOLD, 16);
-
+	
+	
 	// 서버
 	ServerSocket server;
 
+	// 스레드 동기화 관리객체
+	Object syncObject = new Object();
+	
 	// 자소켓을 관리할 ArrayList (initServer)
 	List<ReadThread> socketList = new ArrayList<ReadThread>();
 
-	// 유전관리객체
+	// 유저관리객체
 	List<String> userList = new ArrayList<String>();
 
 	public MultiServer() {
@@ -75,15 +79,19 @@ public class MultiServer extends JFrame {
 					while (true) {
 						try {
 							Socket child = server.accept();
-
+							
+							synchronized (syncObject) {
+							// 접속과정
 							ReadThread readThread = new ReadThread(child);
 							readThread.start();
-
+							
 							// 자소켓을 포함한 쓰레드 객체를 arraylist에 추가하기
 							socketList.add(readThread);
-
+							
 							// 접속자수 출력
 							displayUserCount();
+							}
+								
 
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -190,26 +198,52 @@ public class MultiServer extends JFrame {
 
 					// 메시지 분류
 					String[] messageArray = readData.split("#");
-
+					
 					if (messageArray[0].equals("IN")) { // 입장일때
+						synchronized (syncObject) {
+							
 						userList.add(messageArray[1]);
 						displayUserList();
+						sendMessageToAll(readData + "\n");
+						}
+						
+					} else {
+						// 메시지를 접속된 모든 사용자에게 전송
+						synchronized (syncObject) {
+							
+						sendMessageToAll(readData + "\n");
+						}
+						/*
+						 * // 현재 접속자 목록을 모든 사용자에게 전송 sendUserListToAll();
+						 */
 					}
-
-					// 메시지를 접속된 모든 사용자에게 전송
 
 				} catch (IOException e) {
 					// System.out.println("비정상종료");
 					break; // 비정상종료시 (프로그램 강제 종료시)
 				}
 			}
+			
+			synchronized (syncObject) {
+				
 			// 소켓 종료시 현재 쓰레드를 socketList로부터 제거해야한다.
 			int index = socketList.indexOf(this);
+			//퇴장한 사용자의 닉네임 구하기
+			String outMember = userList.get(index);
 			socketList.remove(index);
 			displayUserCount(); // 인원수 갱신정보출력
 			
 			userList.remove(index);
 			displayUserList();
+			
+			//퇴장정보 전송
+			String message = String.format("OUT#%s\n", outMember);
+			sendMessageToAll(message);
+			
+			//현재 접속자 목록을 모든 사용자에게 전송
+			sendUserListToAll();
+			
+			}
 		}
 	}
 	// ------------------------------------------------------------------------
@@ -218,6 +252,28 @@ public class MultiServer extends JFrame {
 		String[] userArray = new String[userList.size()];
 		userList.toArray(userArray);
 		userJList.setListData(userArray);
+	}
+
+	public void sendUserListToAll() {
+		StringBuffer stringBuffer = new StringBuffer("LIST");
+		for(String nickname : userList) {
+			stringBuffer.append("#");
+			stringBuffer.append(nickname);
+			
+		}
+		sendMessageToAll(stringBuffer.toString()+"\n");
+	}
+
+	public void sendMessageToAll(String message) {
+		for(int i =0; i<socketList.size();i++) {
+			try {
+				ReadThread readThread = socketList.get(i);
+				readThread.child.getOutputStream().write(message.getBytes());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 
 }
